@@ -3,7 +3,11 @@
  * Centralized configuration for non-logged in user restrictions
  */
 
-export const GUEST_MESSAGE_LIMIT = 6;
+// Guests can no longer send any messages without an account. The chat UI
+// intercepts the very first send and surfaces a branded sign-up / log-in
+// popup, and the server enforces the same rule (any user message from a
+// guest causes a 403 with type "guest_limit_exceeded").
+export const GUEST_MESSAGE_LIMIT = 0;
 export const GUEST_ALLOWED_MODELS = [
     // EzboAI's own free model — listed first so it becomes the default for guests
     "ezbo/ezbo-1.0",

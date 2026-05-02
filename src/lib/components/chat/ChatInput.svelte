@@ -13,10 +13,17 @@
   } from "$lib/icons/index.js";
   import { VoiceModeState } from "./voice-mode-state.svelte.js";
   import { GUEST_MESSAGE_LIMIT } from "$lib/constants/guest-limits.js";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
+  import { goto } from "$app/navigation";
   import { getAllToolNames, getToolDisplayName } from "$lib/ai/tools/index.js";
   import { IsMounted } from "runed";
   import * as m from "$lib/../paraglide/messages.js";
   import { providerConfig } from "$lib/config/provider-icons.js";
+
+  // Controls the branded "sign up to keep chatting" popup that appears the
+  // moment a guest tries to send a prompt. Guests can no longer get any
+  // response without an account.
+  let showLoginDialog = $state(false);
 
   // Svelte AI Elements components
   import {
@@ -246,7 +253,9 @@
     const hasFiles = (promptInputContext?.files?.length ?? 0) > 0;
 
     if (!hasPrompt && !hasFiles) return true;
-    if (!canGuestSendMessage()) return true;
+    // Note: we intentionally do NOT disable the send button for guests.
+    // We want the click/Enter to fire so we can intercept it in
+    // handlePromptSubmit and open the sign-up / log-in popup.
     return false;
   });
 
@@ -260,7 +269,17 @@
 
     // Require either text content or files
     if (!hasContent && !hasFiles) return;
-    if (!canGuestSendMessage()) return;
+
+    // Guests cannot get any responses — show the sign-up / log-in popup
+    // immediately and abort the send. The server also enforces this.
+    if (!userId) {
+      showLoginDialog = true;
+      return;
+    }
+    if (!canGuestSendMessage()) {
+      showLoginDialog = true;
+      return;
+    }
 
     // Convert FileUIPart[] to AttachedFile[] format for ChatState
     let files: AttachedFile[] | undefined;
@@ -505,36 +524,20 @@
 
 <div class="flex-shrink-0 p-4 w-full flex justify-center">
   <div class="w-full max-w-3xl">
-    <!-- Guest limitation indicator -->
+    <!-- Guest hint: a single inline call-to-action above the input. The
+         actual gating happens in handlePromptSubmit, which opens the
+         branded sign-up / log-in popup as soon as a guest tries to send. -->
     {#if !userId}
-      <div class="mb-2 px-2 text-sm text-muted-foreground">
-        <div class="flex items-center justify-between">
-          <span>
-            {m["interface.guest_mode_usage"]({
-              used: guestMessageCount.toString(),
-              limit: GUEST_MESSAGE_LIMIT.toString(),
-            })}
-          </span>
-          {#if canGuestSendMessage()}
-            <Button
-              variant="ghost"
-              size="sm"
-              onclick={() => (window.location.href = "/login")}
-              class="h-7 underline px-2 cursor-pointer hover:bg-accent"
-            >
-              {m["interface.guest_login_prompt"]()}
-            </Button>
-          {:else}
-            <Button
-              variant="ghost"
-              size="sm"
-              onclick={() => (window.location.href = "/login")}
-              class="h-7 underline px-2 cursor-pointer hover:bg-accent text-orange-600 dark:text-orange-400"
-            >
-              {m["interface.guest_limit_reached"]()}
-            </Button>
-          {/if}
-        </div>
+      <div class="mb-2 px-2 text-sm text-muted-foreground flex items-center justify-between">
+        <span>Sign up to start chatting with EzboAI.</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onclick={() => goto("/login")}
+          class="h-7 underline px-2 cursor-pointer hover:bg-accent"
+        >
+          Log in
+        </Button>
       </div>
     {/if}
 
@@ -896,3 +899,63 @@
     </PromptInput>
   </div>
 </div>
+
+<!-- Branded sign-up / log-in popup shown when a guest tries to send a prompt. -->
+<Dialog.Root bind:open={showLoginDialog}>
+  <Dialog.Content class="sm:max-w-md text-center">
+    <div class="flex flex-col items-center gap-4 pt-2">
+      <div
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-7 w-7"
+        >
+          <path d="M12 2a5 5 0 0 1 5 5v3a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z" />
+          <path d="M3 22a9 9 0 0 1 18 0" />
+        </svg>
+      </div>
+      <Dialog.Header class="space-y-2">
+        <Dialog.Title class="text-xl">Create a free account to chat</Dialog.Title>
+        <Dialog.Description>
+          EzboAI is free to use, but you need an account so we can save your
+          conversations and keep your chats secure. It only takes a few seconds.
+        </Dialog.Description>
+      </Dialog.Header>
+      <div class="flex w-full flex-col gap-2 pt-2 sm:flex-row">
+        <Button
+          class="flex-1"
+          onclick={() => {
+            showLoginDialog = false;
+            goto("/register");
+          }}
+        >
+          Sign up free
+        </Button>
+        <Button
+          variant="outline"
+          class="flex-1"
+          onclick={() => {
+            showLoginDialog = false;
+            goto("/login");
+          }}
+        >
+          Log in
+        </Button>
+      </div>
+      <button
+        type="button"
+        class="text-xs text-muted-foreground hover:underline"
+        onclick={() => (showLoginDialog = false)}
+      >
+        Maybe later
+      </button>
+    </div>
+  </Dialog.Content>
+</Dialog.Root>
