@@ -113,15 +113,17 @@
     return (tierOrder[planTier as keyof typeof tierOrder] || 0) < (tierOrder[currentTier as keyof typeof tierOrder] || 0);
   }
 
-  // ----- price formatters using selected currency -----
+  // ----- price formatters using selected currency + admin-defined FX rates -----
+  const rates = data.currencyRates;
+
   function formatTotal(plan: { priceAmount: number; priceAmountBdt?: number | null }): string {
     return formatCurrency(
-      convertFromUsdCents(plan.priceAmount, currency, plan.priceAmountBdt),
+      convertFromUsdCents(plan.priceAmount, currency, plan.priceAmountBdt, rates),
       currency
     );
   }
   function formatPerMonth(plan: { priceAmount: number; priceAmountBdt?: number | null }): string {
-    const value = convertFromUsdCents(plan.priceAmount, currency, plan.priceAmountBdt) / 12;
+    const value = convertFromUsdCents(plan.priceAmount, currency, plan.priceAmountBdt, rates) / 12;
     return formatCurrency(value, currency);
   }
   function getYearlySavings(tier: string): string | null {
@@ -129,8 +131,8 @@
     const monthly = monthlyPaidPlans.find((p) => p.tier === tier);
     const yearly = yearlyPaidPlans.find((p) => p.tier === tier);
     if (!monthly || !yearly) return null;
-    const monthlyValue = convertFromUsdCents(monthly.priceAmount, currency, monthly.priceAmountBdt);
-    const yearlyValue = convertFromUsdCents(yearly.priceAmount, currency, yearly.priceAmountBdt);
+    const monthlyValue = convertFromUsdCents(monthly.priceAmount, currency, monthly.priceAmountBdt, rates);
+    const yearlyValue = convertFromUsdCents(yearly.priceAmount, currency, yearly.priceAmountBdt, rates);
     const savings = monthlyValue * 12 - yearlyValue;
     if (savings <= 0) return null;
     return formatCurrency(savings, currency);

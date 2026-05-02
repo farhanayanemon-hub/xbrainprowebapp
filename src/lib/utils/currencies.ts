@@ -22,8 +22,28 @@ export const CURRENCIES: Record<CurrencyCode, CurrencyMeta> = {
 
 export const DEFAULT_CURRENCY: CurrencyCode = "BDT";
 
+export type CurrencyRates = Partial<Record<CurrencyCode, number>>;
+
 export function isCurrencyCode(v: string | null | undefined): v is CurrencyCode {
   return !!v && v in CURRENCIES;
+}
+
+/**
+ * Build the effective rate map by overlaying admin-saved rate overrides on the static defaults.
+ * USD is always 1.
+ */
+export function getEffectiveRates(overrides?: CurrencyRates | null): Record<CurrencyCode, number> {
+  const out = {} as Record<CurrencyCode, number>;
+  for (const code of Object.keys(CURRENCIES) as CurrencyCode[]) {
+    const override = overrides?.[code];
+    out[code] =
+      code === "USD"
+        ? 1
+        : typeof override === "number" && override > 0
+          ? override
+          : CURRENCIES[code].rateFromUsd;
+  }
+  return out;
 }
 
 /**
@@ -33,14 +53,15 @@ export function isCurrencyCode(v: string | null | undefined): v is CurrencyCode 
 export function convertFromUsdCents(
   usdCents: number,
   target: CurrencyCode,
-  bdtPaisa?: number | null
+  bdtPaisa?: number | null,
+  rates?: Record<CurrencyCode, number> | CurrencyRates | null
 ): number {
   if (target === "BDT" && bdtPaisa != null && bdtPaisa > 0) {
     return bdtPaisa / 100;
   }
   const usd = usdCents / 100;
-  const meta = CURRENCIES[target];
-  return usd * meta.rateFromUsd;
+  const rate = rates?.[target] ?? CURRENCIES[target].rateFromUsd;
+  return usd * rate;
 }
 
 export function formatCurrency(amount: number, currency: CurrencyCode): string {
@@ -56,8 +77,9 @@ export function formatCurrency(amount: number, currency: CurrencyCode): string {
 export function formatPriceInCurrency(
   usdCents: number,
   currency: CurrencyCode,
-  bdtPaisa?: number | null
+  bdtPaisa?: number | null,
+  rates?: Record<CurrencyCode, number> | CurrencyRates | null
 ): string {
-  const value = convertFromUsdCents(usdCents, currency, bdtPaisa);
+  const value = convertFromUsdCents(usdCents, currency, bdtPaisa, rates);
   return formatCurrency(value, currency);
 }

@@ -17,6 +17,7 @@
     HomeIcon,
     CirclePlusIcon,
     MessageCircleIcon,
+    WalletIcon,
   } from "$lib/icons/index.js";
 
   let { children, data } = $props();
@@ -52,6 +53,12 @@
       label: "Pricing Plans",
       path: "/admin/settings/plans",
       icon: GemIcon,
+    },
+    {
+      id: "currencies",
+      label: "Currencies",
+      path: "/admin/settings/currencies",
+      icon: WalletIcon,
     },
     {
       id: "credit-plans",
