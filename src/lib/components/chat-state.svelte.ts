@@ -23,7 +23,9 @@ export interface AttachedFile {
 export class ChatState {
   // Chat state
   prompt = $state("");
-  selectedModel = $state("google/gemma-3-27b-it:free");
+  // Default selected model is EzboAI's own brand. Available to free users, guests,
+  // and paid users. The user can change it from the model picker at any time.
+  selectedModel = $state("ezbo/ezbo-1.0");
   isLoading = $state(false);
   isStreamingContent = $state(false);
   messages = $state<AIMessage[]>([]);
@@ -207,8 +209,10 @@ export class ChatState {
               }
             }
           } else if (!this.selectedModel) {
-            // Logged in user: use first available model if none selected
-            this.selectedModel = this.models[0].name;
+            // Logged in user: prefer EzboAI's own model as the default if it
+            // is in the available list, otherwise fall back to the first model.
+            const ezboDefault = this.models.find(m => m.name === "ezbo/ezbo-1.0");
+            this.selectedModel = ezboDefault ? ezboDefault.name : this.models[0].name;
           }
         }
       }

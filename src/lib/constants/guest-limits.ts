@@ -5,6 +5,8 @@
 
 export const GUEST_MESSAGE_LIMIT = 6;
 export const GUEST_ALLOWED_MODELS = [
+    // EzboAI's own free model — listed first so it becomes the default for guests
+    "ezbo/ezbo-1.0",
     "google/gemma-3-27b-it:free",
     "openai/gpt-oss-20b:free",
     "moonshotai/kimi-k2:free"

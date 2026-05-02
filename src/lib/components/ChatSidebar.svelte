@@ -174,7 +174,7 @@
         <Logo alt="App Logo" />
       </div>
 
-      <!-- New Chat Button with Plus Menu -->
+      <!-- New Chat Button -->
       <div class="flex items-center gap-1 mr-2">
         <div
           class="group/newchat flex-1 flex items-center p-2 gap-1 text-md font-semibold cursor-pointer hover:text-primary transition-colors hover:bg-accent/100 rounded-md"
@@ -193,30 +193,6 @@
           />
           <span>{m["nav.new_chat"]()}</span>
         </div>
-
-        <Popover.Root bind:open={plusMenuOpen}>
-          <Popover.Trigger>
-            {#snippet child({ props })}
-              <button
-                {...props}
-                class="p-1.5 rounded-md hover:bg-accent/100 transition-colors cursor-pointer"
-              >
-                <CirclePlusIcon
-                  class="w-5 h-5 transition-transform duration-300 {plusMenuOpen ? 'rotate-45' : ''} hover:scale-110"
-                />
-              </button>
-            {/snippet}
-          </Popover.Trigger>
-          <Popover.Content side="right" align="start" class="w-48 p-1">
-            <button
-              class="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors cursor-pointer"
-              onclick={() => { plusMenuOpen = false; chatState.startNewChat(); }}
-            >
-              <MessageCircleIcon class="w-4 h-4" />
-              {m["nav.new_chat"]()}
-            </button>
-          </Popover.Content>
-        </Popover.Root>
       </div>
 
       <hr class="my-2 mr-2 border-border" />
