@@ -194,12 +194,6 @@
         <!-- User message -->
         <Message from="user">
           <MessageContent>
-            <div
-              class="text-sm font-medium mb-1 text-slate-600 dark:text-slate-400 italic"
-            >
-              You
-            </div>
-
             {#if editingMessageIndex === index}
               <!-- Edit Mode -->
               <div class="space-y-3">
