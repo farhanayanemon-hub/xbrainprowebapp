@@ -495,6 +495,7 @@ export class ChatState {
     } catch (err) {
       console.error("Failed to load chat:", err);
       this.error = "Failed to load chat";
+      toast.error("Failed to load chat");
       return false;
     } finally {
       this.isLoadingChat = false;
@@ -1643,6 +1644,7 @@ export class ChatState {
               } else {
                 this.error = fetchError.message;
               }
+              if (this.error) toast.error(this.error);
             }
 
             // Don't retry if we have partial content

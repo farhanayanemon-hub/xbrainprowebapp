@@ -558,14 +558,7 @@
       {/if}
     {/each}
 
-    {#if error}
-      <div class="flex justify-center">
-        <div
-          class="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-4 py-2 text-sm"
-        >
-          Error: {error}
-        </div>
-      </div>
-    {/if}
+    <!-- Errors are shown as toast popups via svelte-sonner (see chat-state.svelte.ts and hooks.client.ts). No inline error block. -->
+
   </div>
 </div>
