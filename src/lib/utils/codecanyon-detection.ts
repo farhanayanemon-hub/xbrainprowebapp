@@ -10,14 +10,14 @@
  * @returns true if in iframe, false otherwise
  */
 export function isInIframe(): boolean {
-	if (typeof window === 'undefined') return false;
+        if (typeof window === 'undefined') return false;
 
-	try {
-		return window.self !== window.top;
-	} catch {
-		// If we get a security error, we're likely in a cross-origin iframe
-		return true;
-	}
+        try {
+                return window.self !== window.top;
+        } catch {
+                // If we get a security error, we're likely in a cross-origin iframe
+                return true;
+        }
 }
 
 /**
@@ -25,18 +25,21 @@ export function isInIframe(): boolean {
  * @param path - The path to navigate to (e.g., '/register', '/pricing')
  */
 export function breakOutToPath(path: string): void {
-	if (typeof window === 'undefined') return;
-	if (!isInIframe()) return;
+        if (typeof window === 'undefined') return;
+        if (!isInIframe()) return;
 
-	const targetUrl = `${window.location.origin}${path}`;
+        const targetUrl = `${window.location.origin}${path}`;
 
-	try {
-		if (window.top) {
-			// Break out of iframe and navigate parent window to our app
-			window.top.location.href = targetUrl;
-		}
-	} catch {
-		// If we can't access window.top (cross-origin restriction), open in new tab
-		window.open(targetUrl, '_blank');
-	}
+        try {
+                if (window.top) {
+                        // Break out of iframe and navigate parent window to our app
+                        window.top.location.href = targetUrl;
+                        return;
+                }
+        } catch {
+                // Cross-origin restriction - fall through to in-iframe navigation below
+        }
+
+        // Fallback: navigate within the current iframe (same-origin destination always works)
+        window.location.href = targetUrl;
 }
