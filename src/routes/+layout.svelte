@@ -129,3 +129,10 @@
 {/if}
 
 <Toaster position="top-center" />
+
+{#if data.session?.user?.id && data.needsNameOnboarding}
+  {#await import("$lib/components/OnboardingDialog.svelte") then mod}
+    {@const OnboardingDialog = mod.default}
+    <OnboardingDialog />
+  {/await}
+{/if}
