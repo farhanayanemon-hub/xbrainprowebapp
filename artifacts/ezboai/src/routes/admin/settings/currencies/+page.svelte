@@ -194,27 +194,31 @@
         {/if}
       </Button>
 
-      <form
-        method="POST"
-        action="?/reset"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            await update();
-            if (result.type === "success") {
-              toast.success("Reset to default rates");
-              await invalidateAll();
-            }
-          };
-        }}
-      >
-        <Button type="submit" variant="ghost" disabled={data.isDemoMode}>
-          Reset all to defaults
-        </Button>
-      </form>
-
       {#if data.isDemoMode}
         <span class="text-xs text-muted-foreground">Demo mode — saving is disabled</span>
       {/if}
     </div>
+  </form>
+
+  <!-- Separate form (cannot be nested) for Reset action -->
+  <form
+    method="POST"
+    action="?/reset"
+    use:enhance={() => {
+      return async ({ result, update }) => {
+        await update();
+        if (result.type === "success") {
+          toast.success("Reset to default rates");
+          rates = Object.fromEntries(
+            Object.entries(data.defaults).map(([k, v]) => [k, String(v)])
+          );
+          await invalidateAll();
+        }
+      };
+    }}
+  >
+    <Button type="submit" variant="ghost" disabled={data.isDemoMode} class="text-muted-foreground hover:text-foreground">
+      Reset all rates to defaults
+    </Button>
   </form>
 </div>
