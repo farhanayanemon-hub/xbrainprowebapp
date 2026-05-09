@@ -4,6 +4,7 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
   import * as Select from "$lib/components/ui/select/index.js";
+  import AllowedModelsSelect from "$lib/components/AllowedModelsSelect.svelte";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
   import { Switch } from "$lib/components/ui/switch/index.js";
   import { goto } from "$app/navigation";
@@ -340,6 +341,10 @@
             value={featuresText()}
             rows={5}
           />
+
+          <div class="mt-6">
+            <AllowedModelsSelect selected={(data.plan as any).allowedModels || []} />
+          </div>
           <p class="text-xs text-muted-foreground">
             Enter each feature on a separate line
           </p>

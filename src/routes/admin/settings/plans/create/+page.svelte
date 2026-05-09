@@ -5,6 +5,7 @@
   import { Label } from "$lib/components/ui/label/index.js";
   import * as Select from "$lib/components/ui/select/index.js";
   import { Textarea } from "$lib/components/ui/textarea/index.js";
+  import AllowedModelsSelect from "$lib/components/AllowedModelsSelect.svelte";
   import { goto } from "$app/navigation";
   import { enhance } from '$app/forms';
   
@@ -302,6 +303,10 @@
             value={form?.features || ''}
             rows={5}
           />
+
+          <div class="mt-6">
+            <AllowedModelsSelect selected={[]} />
+          </div>
           <p class="text-xs text-muted-foreground">Enter each feature on a separate line</p>
         </div>
 

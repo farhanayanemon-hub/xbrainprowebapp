@@ -64,6 +64,7 @@ export const actions: Actions = {
     const audioGenerationLimit = data.get('audioGenerationLimit')?.toString()
     const voiceGenerationLimit = data.get('voiceGenerationLimit')?.toString()
     const features = data.get('features')?.toString()
+    const allowedModels = data.getAll('allowedModels').map(v => v.toString())
     const isActive = data.get('isActive') === 'on'
 
     // Validation
@@ -178,6 +179,7 @@ export const actions: Actions = {
           audioGenerationLimit: audioLimit !== null && !isNaN(audioLimit) ? audioLimit : null,
           voiceGenerationLimit: voiceLimit !== null && !isNaN(voiceLimit) ? voiceLimit : null,
           features: featuresArray,
+          allowedModels,
           isActive,
           updatedAt: new Date()
         })
