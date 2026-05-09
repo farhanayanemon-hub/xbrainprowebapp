@@ -252,7 +252,8 @@ export const actions: Actions = {
     } catch (err) {
       console.error('Error updating user role:', err)
       return fail(500, { error: 'Failed to update user role. Please try again.' })
-    },
+    }
+  },
 
   toggleActive: async ({ request, params, locals }) => {
     const session = await locals.auth()
