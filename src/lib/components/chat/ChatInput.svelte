@@ -29,6 +29,7 @@
 
   // Hidden file inputs for the three attach options (Camera / Image / Files)
   // shown in the "+" action menu. Each one opens a different native picker.
+  let cameraOpen = $state(false);
   let cameraInputEl = $state<HTMLInputElement | null>(null);
   let imageInputEl = $state<HTMLInputElement | null>(null);
   let fileInputEl = $state<HTMLInputElement | null>(null);
@@ -86,6 +87,7 @@
   } from "../chat-utils/model-capabilities.js";
   import type { AIModelConfig } from "$lib/ai/types.js";
   import type { AttachedFile } from "../chat-state.svelte.js";
+  import CameraCaptureModal from "./CameraCaptureModal.svelte";
   import { isTextFileMimeType } from "$lib/utils/file-types.js";
 
   interface Props {
@@ -608,7 +610,9 @@
               <PromptInputActionMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
-                  cameraInputEl?.click();
+                  // On desktop, file-input capture is ignored — open a real camera modal.
+                  // On mobile, this still works as a clean photo-capture flow.
+                  cameraOpen = true;
                 }}
               >
                 <CameraIcon class="mr-2 size-4" />
@@ -962,6 +966,15 @@
   multiple
   class="hidden"
   onchange={handleAttachmentChange}
+/>
+
+<!-- Camera modal for taking photos via webcam (desktop) or device camera (mobile fallback). -->
+<CameraCaptureModal
+  bind:open={cameraOpen}
+  onCapture={(file) => {
+    promptInputContext?.add([file]);
+  }}
+  onClose={() => (cameraOpen = false)}
 />
 
 <!-- Branded sign-up / log-in popup shown when a guest tries to send a prompt. -->
