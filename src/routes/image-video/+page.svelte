@@ -2130,4 +2130,37 @@
       background-position: -200% 0;
     }
   }
+
+  /* Mobile fit — bottom toolbar items wrap so Generate button stays visible */
+  :global([data-slot="input-group-addon"][data-align="block-end"]) {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    min-width: 0;
+  }
+  :global([data-slot="input-group-addon"][data-align="block-end"] > *) {
+    min-width: 0;
+  }
+  /* Generate button must always be visible on its own line if needed */
+  :global([data-slot="input-group-addon"][data-align="block-end"] > .ms-auto) {
+    margin-left: auto;
+  }
+  /* Tighten padding on small screens so input bar fits */
+  @media (max-width: 640px) {
+    :global(.fixed.bottom-0 .pt-8.pb-4.px-6) {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      padding-top: 1rem;
+    }
+    :global([data-slot="input-group-addon"][data-align="block-end"]) {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      gap: 0.375rem;
+    }
+    /* Compact button text on phones */
+    :global([data-slot="input-group-addon"] [data-slot="input-group-button"]) {
+      font-size: 0.75rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+  }
 </style>
