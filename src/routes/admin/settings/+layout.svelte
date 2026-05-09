@@ -73,6 +73,12 @@
       icon: KeyIcon,
     },
     {
+      id: "xbrain-models",
+      label: "XBrain Models",
+      path: "/admin/settings/xbrain-models",
+      icon: BrainIcon,
+    },
+    {
       id: "ai-models",
       label: "AI Models",
       path: "/admin/settings/ai-models",
