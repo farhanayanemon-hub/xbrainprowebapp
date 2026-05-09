@@ -417,15 +417,53 @@
           </Table.Row>
           <Table.Row>
             <Table.Cell class="font-medium">Account Status</Table.Cell>
-            <Table.Cell class="text-muted-foreground italic"
-              >Coming soon</Table.Cell
-            >
+            <Table.Cell>
+              {#if data.user.isActive !== false}
+                <span class="inline-block px-2 py-0.5 text-xs rounded bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">Active</span>
+              {:else}
+                <span class="inline-block px-2 py-0.5 text-xs rounded bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">Deactivated</span>
+                {#if data.user.deactivatedAt}
+                  <span class="text-xs text-muted-foreground ml-2">on {formatDate(data.user.deactivatedAt)}</span>
+                {/if}
+                {#if data.user.deactivationReason}
+                  <div class="text-xs text-muted-foreground mt-1">Reason: {data.user.deactivationReason}</div>
+                {/if}
+              {/if}
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell class="font-medium">Deactivate Account</Table.Cell>
-            <Table.Cell class="text-muted-foreground italic"
-              >Coming soon</Table.Cell
-            >
+            <Table.Cell class="font-medium">{data.user.isActive !== false ? 'Deactivate Account' : 'Reactivate Account'}</Table.Cell>
+            <Table.Cell>
+              <form method="POST" action="?/toggleActive" use:enhance class="flex items-center gap-2 flex-wrap">
+                {#if data.user.isActive !== false}
+                  <input type="text" name="reason" placeholder="Reason (optional, e.g. spam, abuse)" class="border rounded px-2 py-1 text-sm flex-1 min-w-[200px] bg-background" />
+                  <Button type="submit" variant="destructive" size="sm" disabled={data.user.id === data.currentAdminId || data.isDemoMode}>
+                    Deactivate
+                  </Button>
+                {:else}
+                  <Button type="submit" variant="default" size="sm" disabled={data.isDemoMode}>
+                    Reactivate Account
+                  </Button>
+                {/if}
+              </form>
+              {#if data.user.id === data.currentAdminId}
+                <p class="text-xs text-muted-foreground mt-1">You cannot deactivate your own account.</p>
+              {/if}
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell class="font-medium">Current Plan</Table.Cell>
+            <Table.Cell>
+              <form method="POST" action="?/assignPlan" use:enhance class="flex items-center gap-2 flex-wrap">
+                <select name="planTier" class="border rounded px-2 py-1 text-sm bg-background" disabled={data.isDemoMode}>
+                  {#each ['free','starter','pro','advanced'] as t}
+                    <option value={t} selected={data.user.planTier === t}>{t}</option>
+                  {/each}
+                </select>
+                <Button type="submit" size="sm" disabled={data.isDemoMode}>Assign Plan</Button>
+                <span class="text-xs text-muted-foreground">Current: <strong>{data.user.planTier || 'free'}</strong></span>
+              </form>
+            </Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table.Root>

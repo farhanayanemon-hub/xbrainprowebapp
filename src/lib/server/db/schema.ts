@@ -624,3 +624,30 @@ export const userCredits = pgTable("user_credit", {
 }, (table) => [
         index('user_credits_user_type_idx').on(table.userId, table.creditType),
 ])
+
+export const manualOrders = pgTable("manual_orders", {
+        id: text("id").primaryKey().$defaultFn(() => randomUUID()),
+        userId: text("userId").references(() => users.id, { onDelete: "set null" }),
+        userEmail: text("userEmail"),
+        planId: text("planId"),
+        planName: text("planName"),
+        planTier: text("planTier", { enum: ["free", "starter", "pro", "advanced"] }),
+        gateway: text("gateway", { enum: ["paypal", "wise", "skrill", "binance", "bybit", "manual", "stripe", "opaybd"] }).notNull().default("manual"),
+        amount: integer("amount").notNull(),
+        currency: text("currency").notNull().default("usd"),
+        status: text("status", { enum: ["new", "pending", "completed", "cancelled"] }).notNull().default("new"),
+        txnReference: text("txnReference"),
+        senderInfo: text("senderInfo"),
+        proofUrl: text("proofUrl"),
+        userNotes: text("userNotes"),
+        adminNotes: text("adminNotes"),
+        completedBy: text("completedBy"),
+        completedAt: timestamp("completedAt", { mode: "date" }),
+        cancelledBy: text("cancelledBy"),
+        cancelledAt: timestamp("cancelledAt", { mode: "date" }),
+        createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+        updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
+}, (table) => [
+        index('manual_orders_status_idx').on(table.status),
+        index('manual_orders_user_idx').on(table.userId),
+])

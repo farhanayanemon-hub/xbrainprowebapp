@@ -37,6 +37,11 @@
       path: "/admin/payments",
     },
     {
+      id: "orders",
+      label: "Orders",
+      path: "/admin/orders",
+    },
+    {
       id: "subscriptions",
       label: "Subscriptions",
       path: "/admin/subscriptions",

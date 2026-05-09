@@ -252,6 +252,43 @@ export const actions: Actions = {
     } catch (err) {
       console.error('Error updating user role:', err)
       return fail(500, { error: 'Failed to update user role. Please try again.' })
+    },
+
+  toggleActive: async ({ request, params, locals }) => {
+    const session = await locals.auth()
+    if (!session?.user?.isAdmin) return fail(403, { error: 'Forbidden' })
+    if (isDemoModeEnabled()) return fail(403, { error: DEMO_MODE_MESSAGES.ADMIN_SAVE_DISABLED })
+    const userId = params.id
+    if (userId === session.user.id) return fail(400, { error: 'You cannot deactivate your own account' })
+    const u = (await db.select().from(users).where(eq(users.id, userId)).limit(1))[0]
+    if (!u) return fail(404, { error: 'User not found' })
+    const data = await request.formData()
+    const reason = data.get('reason')?.toString() || null
+    const newActive = !((u as any).isActive !== false)
+    await db.update(users).set({
+      isActive: newActive,
+      deactivatedAt: newActive ? null : new Date(),
+      deactivationReason: newActive ? null : reason,
+    } as any).where(eq(users.id, userId))
+    return { success: true, message: newActive ? 'Account reactivated' : 'Account deactivated' }
+  },
+
+  assignPlan: async ({ request, params, locals }) => {
+    const session = await locals.auth()
+    if (!session?.user?.isAdmin) return fail(403, { error: 'Forbidden' })
+    if (isDemoModeEnabled()) return fail(403, { error: DEMO_MODE_MESSAGES.ADMIN_SAVE_DISABLED })
+    const userId = params.id
+    const data = await request.formData()
+    const planTier = data.get('planTier')?.toString()
+    if (!planTier || !['free','starter','pro','advanced'].includes(planTier)) {
+      return fail(400, { error: 'Invalid plan tier' })
     }
+    await db.update(users).set({
+      planTier: planTier as 'free'|'starter'|'pro'|'advanced',
+      subscriptionStatus: planTier === 'free' ? 'incomplete' : 'active',
+    }).where(eq(users.id, userId))
+    return { success: true, message: `Plan changed to ${planTier}` }
   }
+
+}
 }
