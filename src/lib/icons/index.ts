@@ -129,3 +129,4 @@ export { default as MessageSquareIcon } from "@lucide/svelte/icons/message-squar
 // Email template icons
 export { default as EditIcon } from "@lucide/svelte/icons/edit";
 export { default as RotateCcwIcon } from "@lucide/svelte/icons/rotate-ccw";
+export { default as CopyIcon } from "@lucide/svelte/icons/copy";
