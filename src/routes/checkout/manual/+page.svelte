@@ -93,7 +93,11 @@
               onclick={() => (selectedId = g.id)}
               class="w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left {selectedId === g.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'}"
             >
-              <span class="text-2xl">{g.icon}</span>
+              {#if g.iconUrl}
+                <img src={g.iconUrl} alt={g.name} class="size-8 rounded object-contain bg-white border p-0.5" />
+              {:else}
+                <span class="text-2xl">{g.icon}</span>
+              {/if}
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-sm">{g.displayName || g.name}</div>
                 <div class="text-xs text-muted-foreground truncate">Manual transfer</div>
@@ -109,7 +113,11 @@
             <Card.Root>
               <Card.Header>
                 <Card.Title class="flex items-center gap-2">
-                  <span class="text-2xl">{selected.icon}</span>
+                  {#if selected.iconUrl}
+                    <img src={selected.iconUrl} alt={selected.name} class="size-7 rounded object-contain bg-white border p-0.5" />
+                  {:else}
+                    <span class="text-2xl">{selected.icon}</span>
+                  {/if}
                   Pay with {selected.displayName || selected.name}
                 </Card.Title>
               </Card.Header>

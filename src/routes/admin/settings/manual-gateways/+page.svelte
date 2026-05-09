@@ -5,6 +5,7 @@
   import { Input } from '$lib/components/ui/input/index.js';
   import { Label } from '$lib/components/ui/label/index.js';
   import { Textarea } from '$lib/components/ui/textarea/index.js';
+  import { UploadIcon, XIcon } from '$lib/icons/index.js';
   let { data, form } = $props();
 </script>
 
@@ -24,26 +25,64 @@
       ✓ Saved {form.savedId}
     </div>
   {/if}
+  {#if form?.error}
+    <div class="p-3 rounded bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 text-sm">
+      ✗ {form.error}
+    </div>
+  {/if}
 
   <div class="grid gap-4">
     {#each data.gateways as g}
       <Card.Root>
         <Card.Header>
-          <Card.Title class="flex items-center gap-2">
-            <span class="text-2xl">{g.icon}</span>
+          <Card.Title class="flex items-center gap-3">
+            {#if g.iconUrl}
+              <img src={g.iconUrl} alt={g.name} class="size-8 rounded object-contain bg-white border p-0.5" />
+            {:else}
+              <span class="text-2xl">{g.icon}</span>
+            {/if}
             <span>{g.name}</span>
             {#if g.enabled}<span class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">Active</span>
             {:else}<span class="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Disabled</span>{/if}
           </Card.Title>
         </Card.Header>
         <Card.Content>
-          <form method="POST" action="?/save" use:enhance class="space-y-4">
+          <form method="POST" action="?/save" enctype="multipart/form-data" use:enhance class="space-y-4">
             <input type="hidden" name="id" value={g.id} />
 
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" name="enabled" checked={g.enabled} />
               <span class="text-sm font-medium">Enable {g.name} as a payment option</span>
             </label>
+
+            <!-- Icon / Logo upload -->
+            <div class="space-y-2">
+              <Label>Logo / Icon (optional — uploaded image overrides the default emoji)</Label>
+              <div class="flex items-center gap-4 flex-wrap">
+                <div class="size-16 border rounded-lg flex items-center justify-center bg-muted shrink-0 overflow-hidden">
+                  {#if g.iconUrl}
+                    <img src={g.iconUrl} alt={g.name} class="max-w-full max-h-full object-contain" />
+                  {:else}
+                    <span class="text-3xl">{g.icon}</span>
+                  {/if}
+                </div>
+                <div class="flex-1 min-w-[200px] space-y-1">
+                  <Input
+                    type="file"
+                    name="iconFile"
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                    class="cursor-pointer"
+                  />
+                  <p class="text-xs text-muted-foreground">PNG, JPG, SVG or WebP (recommended: square, 128x128 or larger).</p>
+                  {#if g.iconUrl}
+                    <label class="inline-flex items-center gap-1.5 text-xs text-destructive cursor-pointer mt-1">
+                      <input type="checkbox" name="removeIcon" />
+                      <XIcon class="size-3" /> Remove uploaded logo (use default emoji)
+                    </label>
+                  {/if}
+                </div>
+              </div>
+            </div>
 
             <div class="grid md:grid-cols-2 gap-4">
               <div class="space-y-2">

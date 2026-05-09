@@ -10,22 +10,23 @@ export interface ManualGateway {
   accountInfo: string;     // email / wallet / username
   displayName: string;     // e.g. "Pay with PayPal"
   instructions: string;    // English instructions shown to user
+  iconUrl: string;         // Optional uploaded logo URL (overrides emoji icon)
 }
 
 export const GATEWAY_DEFAULTS: Record<GatewayId, Omit<ManualGateway, 'id'>> = {
   paypal:  { name: 'PayPal',  icon: '💳', enabled: false, accountInfo: '', displayName: 'PayPal',
-             instructions: 'Send the exact amount in USD to our PayPal email above as "Friends & Family" (no fees). After sending, copy the PayPal Transaction ID and paste it in the field below. Order will be activated within 1–6 hours after verification.' },
+             instructions: 'Send the exact amount in USD to our PayPal email above as "Friends & Family" (no fees). After sending, copy the PayPal Transaction ID and paste it in the field below. Order will be activated within 1–6 hours after verification.', iconUrl: '' },
   wise:    { name: 'Wise',    icon: '🌐', enabled: false, accountInfo: '', displayName: 'Wise (TransferWise)',
-             instructions: 'Send the exact amount in USD/EUR to the Wise email/account above. After payment, copy the Wise transaction reference and paste it below with sender name. We verify and activate within 1–24 hours.' },
+             instructions: 'Send the exact amount in USD/EUR to the Wise email/account above. After payment, copy the Wise transaction reference and paste it below with sender name. We verify and activate within 1–24 hours.', iconUrl: '' },
   skrill:  { name: 'Skrill',  icon: '💸', enabled: false, accountInfo: '', displayName: 'Skrill',
-             instructions: 'Send the exact USD amount to our Skrill email above. After sending, copy the Skrill transaction ID and submit it below. We will verify and activate your subscription within 1–6 hours.' },
+             instructions: 'Send the exact USD amount to our Skrill email above. After sending, copy the Skrill transaction ID and submit it below. We will verify and activate your subscription within 1–6 hours.', iconUrl: '' },
   binance: { name: 'Binance', icon: '🪙', enabled: false, accountInfo: '', displayName: 'Binance Pay (USDT)',
-             instructions: 'Send the equivalent USDT (TRC20 or BEP20) to the Binance Pay ID / address above. After sending, copy the Binance transaction ID (TxID/UID) and paste it below with the network used. Activation within 30 minutes – 6 hours.' },
+             instructions: 'Send the equivalent USDT (TRC20 or BEP20) to the Binance Pay ID / address above. After sending, copy the Binance transaction ID (TxID/UID) and paste it below with the network used. Activation within 30 minutes – 6 hours.', iconUrl: '' },
   bybit:   { name: 'Bybit',   icon: '🟡', enabled: false, accountInfo: '', displayName: 'Bybit (USDT)',
-             instructions: 'Send the equivalent USDT (TRC20/BEP20) to our Bybit UID / wallet above. After sending, copy the Bybit TxID/Order ID and submit below. We activate within 30 minutes – 6 hours after on-chain confirmation.' },
+             instructions: 'Send the equivalent USDT (TRC20/BEP20) to our Bybit UID / wallet above. After sending, copy the Bybit TxID/Order ID and submit below. We activate within 30 minutes – 6 hours after on-chain confirmation.', iconUrl: '' },
 };
 
-const KEYS = ['enabled', 'accountInfo', 'displayName', 'instructions'] as const;
+const KEYS = ['enabled', 'accountInfo', 'displayName', 'instructions', 'iconUrl'] as const;
 const k = (id: GatewayId, field: string) => `manual_gateway_${id}_${field}`;
 
 export async function loadAllGateways(): Promise<ManualGateway[]> {
