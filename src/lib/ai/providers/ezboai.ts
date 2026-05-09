@@ -30,6 +30,7 @@ import { openRouterProvider } from './openrouter.js';
 
 const EZBO_MODEL_1 = 'ezbo/ezbo-1.0';
 const EZBO_MODEL_1_PRO = 'ezbo/ezbo-1.0-pro';
+const EZBO_MODEL_THINKING = 'ezbo/xbrain-p2-thinking';
 
 const EZBOAI_MODELS: AIModelConfig[] = [
         {
@@ -99,6 +100,18 @@ const ROUTE_MAP_PRO: Record<Category, string> = {
         vision: 'google/gemini-3-pro-preview',
 };
 const PRO_DEFAULT = 'anthropic/claude-sonnet-4.5';
+
+// Thinking tier — uses dedicated reasoning models for deep research / long thinking.
+const ROUTE_MAP_THINKING: Record<Category, string> = {
+	code: 'deepseek/deepseek-r1-0528',
+	math: 'deepseek/deepseek-r1-0528',
+	creative: 'anthropic/claude-opus-4.5',
+	factual: 'qwen/qwen3-235b-a22b-thinking-2507',
+	conversation: 'qwen/qwen3-235b-a22b-thinking-2507',
+	analysis: 'deepseek/deepseek-r1-0528',
+	vision: 'google/gemini-3-pro-preview',
+};
+const THINKING_DEFAULT = 'deepseek/deepseek-r1-0528';
 
 const EZBO_IDENTITY_PROMPT = [
         'You are XBrainPro, a helpful AI assistant created by XBrainPro Labs.',
@@ -301,4 +314,4 @@ export const ezboaiProvider: AIProvider = {
         },
 };
 
-export { EZBO_MODEL_1, EZBO_MODEL_1_PRO };
+export { EZBO_MODEL_1, EZBO_MODEL_1_PRO, EZBO_MODEL_THINKING };
