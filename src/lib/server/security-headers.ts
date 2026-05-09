@@ -108,8 +108,8 @@ export function getSecurityHeaders(): Record<string, string> {
 
     // Permissions Policy (Feature Policy)
     'Permissions-Policy': [
-      'camera=()',
-      'microphone=()',
+      'camera=(self)',
+      'microphone=(self)',
       'geolocation=()',
       'payment=(self)',
       'usb=()',
