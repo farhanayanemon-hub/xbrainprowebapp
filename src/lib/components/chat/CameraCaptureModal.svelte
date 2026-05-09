@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, untrack } from 'svelte';
   import { Button } from '$lib/components/ui/button/index.js';
   import { CameraIcon, RefreshCwIcon, XIcon } from '$lib/icons/index.js';
 
@@ -94,10 +94,13 @@
     onClose();
   }
 
-  // React to open
+  // React only to `open` flag changes (untrack so writes inside start()/stop() don't re-trigger us).
   $effect(() => {
-    if (open) start();
-    else stop();
+    const isOpen = open;
+    untrack(() => {
+      if (isOpen) start();
+      else stop();
+    });
   });
 
   onDestroy(() => stop());
