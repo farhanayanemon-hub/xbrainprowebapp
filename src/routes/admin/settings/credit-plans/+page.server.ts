@@ -65,17 +65,17 @@ export const actions: Actions = {
     const name = data.get('name')?.toString()
     const description = data.get('description')?.toString() || null
     const creditTypesArr = parseCreditTypes(data)
-    const priceAmountRaw = data.get('priceAmount')?.toString()
+    const priceAmountUsdRaw = data.get('priceAmount')?.toString()
+    const priceAmountBdtRaw = data.get('priceAmountBdt')?.toString()
     const currencyRaw = (data.get('currency')?.toString() || 'USD').toUpperCase()
     const currencyCode: CurrencyCode = isCurrencyCode(currencyRaw) ? currencyRaw : 'USD'
-    const currency = currencyCode.toLowerCase() // legacy DB stores lowercase
-    // Convert admin's whole-unit input (e.g. 1100 BDT, 9.99 USD) into USD cents using saved rates
-    const priceAmountWhole = priceAmountRaw ? parseFloat(priceAmountRaw) : NaN
-    const fxRates = await getCurrencyRatesFromSettings()
-    const priceAmountCents = !isNaN(priceAmountWhole) && priceAmountWhole >= 0 ? wholeUnitsToUsdCents(priceAmountWhole, currencyCode, fxRates) : NaN
-    // Auto-derive BDT paisa amount via rates so Opaybd checkout has a precise BDT price
-    const priceAmountBdt = !isNaN(priceAmountCents) ? Math.round((priceAmountCents / 100) * (fxRates.BDT ?? 110) * 100) : null
+    const currency = currencyCode.toLowerCase()
+    const priceUsdWhole = priceAmountUsdRaw ? parseFloat(priceAmountUsdRaw) : NaN
+    const priceBdtWhole = priceAmountBdtRaw ? parseFloat(priceAmountBdtRaw) : NaN
+    const priceAmountCents = !isNaN(priceUsdWhole) && priceUsdWhole >= 0 ? Math.round(priceUsdWhole * 100) : NaN
+    const priceAmountBdt = !isNaN(priceBdtWhole) && priceBdtWhole >= 0 ? Math.round(priceBdtWhole * 100) : null
     const priceAmount = isNaN(priceAmountCents) ? '' : String(priceAmountCents)
+    const priceAmountRaw = priceAmountUsdRaw
 
     // Collect per-type amounts as { text: 100, image: 50, ... } so each
     // selected category can have its own credit count for one purchase.
@@ -89,7 +89,8 @@ export const actions: Actions = {
         description,
         creditTypes: creditTypesArr,
         creditAmounts: creditAmountsMap,
-        priceAmount: priceAmountRaw,  // echo back whole units to UI
+        priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
       })
 

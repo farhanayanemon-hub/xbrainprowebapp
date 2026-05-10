@@ -73,15 +73,17 @@ export const actions: Actions = {
     const name = data.get('name')?.toString()
     const description = data.get('description')?.toString() || null
     const creditTypesArr = parseCreditTypes(data)
-    const priceAmountRaw = data.get('priceAmount')?.toString()
+    const priceAmountUsdRaw = data.get('priceAmount')?.toString()
+    const priceAmountBdtRaw = data.get('priceAmountBdt')?.toString()
     const currencyRaw = (data.get('currency')?.toString() || 'USD').toUpperCase()
     const currencyCode: CurrencyCode = isCurrencyCode(currencyRaw) ? currencyRaw : 'USD'
     const currency = currencyCode.toLowerCase()
-    const priceAmountWhole = priceAmountRaw ? parseFloat(priceAmountRaw) : NaN
-    const fxRates = await getCurrencyRatesFromSettings()
-    const priceAmountCents = !isNaN(priceAmountWhole) && priceAmountWhole >= 0 ? wholeUnitsToUsdCents(priceAmountWhole, currencyCode, fxRates) : NaN
-    const priceAmountBdt = !isNaN(priceAmountCents) ? Math.round((priceAmountCents / 100) * (fxRates.BDT ?? 110) * 100) : null
+    const priceUsdWhole = priceAmountUsdRaw ? parseFloat(priceAmountUsdRaw) : NaN
+    const priceBdtWhole = priceAmountBdtRaw ? parseFloat(priceAmountBdtRaw) : NaN
+    const priceAmountCents = !isNaN(priceUsdWhole) && priceUsdWhole >= 0 ? Math.round(priceUsdWhole * 100) : NaN
+    const priceAmountBdt = !isNaN(priceBdtWhole) && priceBdtWhole >= 0 ? Math.round(priceBdtWhole * 100) : null
     const priceAmount = isNaN(priceAmountCents) ? '' : String(priceAmountCents)
+    const priceAmountRaw = priceAmountUsdRaw
     const isActive = data.get('isActive') === 'on'
 
     const { amounts: creditAmountsMap, max: creditAmountMax, error: amtErr } =
@@ -95,6 +97,7 @@ export const actions: Actions = {
         creditTypes: creditTypesArr,
         creditAmounts: creditAmountsMap,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         isActive,
       })

@@ -26,15 +26,19 @@ export const actions: Actions = {
     const name = data.get('name')?.toString()
     const tier = data.get('tier')?.toString()
     const stripePriceId = data.get('stripePriceId')?.toString()
-    const priceAmountRaw = data.get('priceAmount')?.toString()
+    const priceAmountUsdRaw = data.get('priceAmount')?.toString()
+    const priceAmountBdtRaw = data.get('priceAmountBdt')?.toString()
     const currencyRaw = (data.get('currency')?.toString() || 'USD').toUpperCase()
     const currencyCode: CurrencyCode = isCurrencyCode(currencyRaw) ? currencyRaw : 'USD'
     const currency = currencyCode.toLowerCase()
-    const priceAmountWhole = priceAmountRaw ? parseFloat(priceAmountRaw) : NaN
-    const fxRates = await getCurrencyRatesFromSettings()
-    const priceAmountCents = !isNaN(priceAmountWhole) && priceAmountWhole >= 0 ? wholeUnitsToUsdCents(priceAmountWhole, currencyCode, fxRates) : NaN
-    const priceAmountBdtPaisa = !isNaN(priceAmountCents) ? Math.round((priceAmountCents / 100) * (fxRates.BDT ?? 110) * 100) : null
+    // Both prices are entered directly as whole units; convert to integer subunits for storage
+    const priceUsdWhole = priceAmountUsdRaw ? parseFloat(priceAmountUsdRaw) : NaN
+    const priceBdtWhole = priceAmountBdtRaw ? parseFloat(priceAmountBdtRaw) : NaN
+    const priceAmountCents = !isNaN(priceUsdWhole) && priceUsdWhole >= 0 ? Math.round(priceUsdWhole * 100) : NaN
+    const priceAmountBdtPaisa = !isNaN(priceBdtWhole) && priceBdtWhole >= 0 ? Math.round(priceBdtWhole * 100) : null
     const priceAmount = isNaN(priceAmountCents) ? '' : String(priceAmountCents)
+    // Echo back whole units to the form on validation failure (priceAmountRaw kept for legacy refs)
+    const priceAmountRaw = priceAmountUsdRaw
     const billingInterval = data.get('billingInterval')?.toString()
     const textGenerationLimit = data.get('textGenerationLimit')?.toString()
     const imageGenerationLimit = data.get('imageGenerationLimit')?.toString()
@@ -52,6 +56,7 @@ export const actions: Actions = {
         tier,
         stripePriceId,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         billingInterval,
         textGenerationLimit,
@@ -70,6 +75,7 @@ export const actions: Actions = {
         tier,
         stripePriceId,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         billingInterval,
         textGenerationLimit,
@@ -88,6 +94,7 @@ export const actions: Actions = {
         tier,
         stripePriceId,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         billingInterval,
         textGenerationLimit,
@@ -107,6 +114,7 @@ export const actions: Actions = {
         tier,
         stripePriceId,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         billingInterval,
         textGenerationLimit,
@@ -169,6 +177,7 @@ export const actions: Actions = {
         tier,
         stripePriceId,
         priceAmount: priceAmountRaw,
+        priceAmountBdt: priceAmountBdtRaw,
         currency: currencyCode,
         billingInterval,
         textGenerationLimit,

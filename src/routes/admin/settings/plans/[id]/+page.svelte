@@ -34,9 +34,8 @@
   ];
 
   const currencyOptions = [
-    { value: "usd", label: "USD" },
-    { value: "eur", label: "EUR" },
-    { value: "gbp", label: "GBP" },
+    { value: "usd", label: "USD ($)" },
+    { value: "bdt", label: "BDT (৳)" },
   ];
 
   const billingOptions = [
@@ -182,22 +181,36 @@
           </div>
         </div>
 
-        <!-- Pricing Information -->
-        <div class="grid grid-cols-1 gap-4">
+                <!-- Pricing Information: enter both BDT and USD whole-unit prices. BDT users pay via Opaybd, USD users via manual gateways. -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-2">
-            <Label for="priceAmount">Price</Label>
+            <Label for="priceAmount">Price USD ($)</Label>
             <Input
               id="priceAmount"
               name="priceAmount"
               type="number"
-              placeholder="2999"
+              step="0.01"
+              placeholder="9.99"
               min="0"
               value={form?.priceAmount ?? priceWholeUnits}
               required
             />
-            <p class="text-xs text-muted-foreground">
-              Direct amount in selected currency (e.g., 10 = ৳10 or $10). Auto-converted for other currencies on display.
-            </p>
+            <p class="text-xs text-muted-foreground">Direct USD amount (e.g., 9.99 = $9.99). Shown to non-BDT users.</p>
+          </div>
+
+          <div class="space-y-2">
+            <Label for="priceAmountBdt">Price BDT (৳)</Label>
+            <Input
+              id="priceAmountBdt"
+              name="priceAmountBdt"
+              type="number"
+              step="1"
+              placeholder="1100"
+              min="0"
+              value={form?.priceAmountBdt ?? priceBdtWholeUnits}
+              required
+            />
+            <p class="text-xs text-muted-foreground">Direct BDT amount (e.g., 1100 = ৳1,100). Shown to BDT users via Opaybd.</p>
           </div>
         </div>
 

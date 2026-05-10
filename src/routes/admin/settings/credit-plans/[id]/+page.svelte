@@ -52,9 +52,8 @@
   ];
 
   const currencyOptions = [
-    { value: "usd", label: "USD" },
-    { value: "eur", label: "EUR" },
-    { value: "gbp", label: "GBP" },
+    { value: "usd", label: "USD ($)" },
+    { value: "bdt", label: "BDT (৳)" },
   ];
 
   const currencyTriggerContent = $derived(
