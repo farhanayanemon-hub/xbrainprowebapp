@@ -183,35 +183,20 @@
         </div>
 
         <!-- Pricing Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4">
           <div class="space-y-2">
-            <Label for="priceAmount">Price USD (in cents)</Label>
+            <Label for="priceAmount">Price</Label>
             <Input
               id="priceAmount"
               name="priceAmount"
               type="number"
               placeholder="2999"
               min="0"
-              value={form?.priceAmount || data.plan.priceAmount}
+              value={form?.priceAmount ?? priceWholeUnits}
               required
             />
             <p class="text-xs text-muted-foreground">
-              Enter price in cents (e.g., 2999 = $29.99)
-            </p>
-          </div>
-
-          <div class="space-y-2">
-            <Label for="priceAmountBdt">Price BDT (in paisa)</Label>
-            <Input
-              id="priceAmountBdt"
-              name="priceAmountBdt"
-              type="number"
-              placeholder="150000"
-              min="0"
-              value={form?.priceAmountBdt || (data.plan.priceAmountBdt ?? "")}
-            />
-            <p class="text-xs text-muted-foreground">
-              For Opaybd payments (e.g., 150000 = ৳1,500)
+              Direct amount in selected currency (e.g., 10 = ৳10 or $10). Auto-converted for other currencies on display.
             </p>
           </div>
         </div>

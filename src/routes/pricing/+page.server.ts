@@ -8,7 +8,7 @@ import { adminSettingsService } from '$lib/server/admin-settings.js';
 import { getEnabledGateways } from '$lib/server/manual-gateways.js';
 import { isCurrencyCode, DEFAULT_CURRENCY, getEffectiveRates, type CurrencyCode, type CurrencyRates } from '$lib/utils/currencies.js';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, request }) => {
         const session = await locals.auth();
 
         try {
@@ -44,6 +44,13 @@ export const load: PageServerLoad = async ({ locals }) => {
                 }
                 const currencyRates = getEffectiveRates(rateOverrides);
 
+                // Detect user currency from Accept-Language header.
+                // Bangladesh locales (bn, bn-BD) → BDT, otherwise admin's defaultCurrency.
+                const acceptLang = (request.headers.get('accept-language') || '').toLowerCase();
+                const userCurrency: CurrencyCode = (acceptLang.startsWith('bn') || acceptLang.includes('-bd'))
+                    ? 'BDT'
+                    : defaultCurrency;
+
                 let currentSubscription = null;
                 let userData = null;
                 if (session?.user?.id) {
@@ -61,6 +68,7 @@ export const load: PageServerLoad = async ({ locals }) => {
                         manualGatewaysEnabled,
                         defaultCurrency,
                         currencyRates,
+                        userCurrency,
                 };
         } catch (error) {
                 console.error('Error loading pricing data:', error);
@@ -73,6 +81,7 @@ export const load: PageServerLoad = async ({ locals }) => {
                         manualGatewaysEnabled: false,
                         defaultCurrency: DEFAULT_CURRENCY,
                         currencyRates: getEffectiveRates({}),
+                        userCurrency: DEFAULT_CURRENCY,
                 };
         }
 };

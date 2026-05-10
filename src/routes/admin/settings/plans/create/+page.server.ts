@@ -2,6 +2,9 @@ import type { Actions, PageServerLoad } from './$types'
 import { db, pricingPlans } from '$lib/server/db'
 import { fail, redirect } from '@sveltejs/kit'
 import { isDemoModeEnabled, DEMO_MODE_MESSAGES } from '$lib/constants/demo-mode.js'
+import { wholeUnitsToUsdCents } from '$lib/utils/price-conversion.js'
+import { getCurrencyRatesFromSettings } from '$lib/server/get-currency-rates.js'
+import { isCurrencyCode, type CurrencyCode } from '$lib/utils/currencies.js'
 
 export const load: PageServerLoad = async () => {
   return {
@@ -23,8 +26,15 @@ export const actions: Actions = {
     const name = data.get('name')?.toString()
     const tier = data.get('tier')?.toString()
     const stripePriceId = data.get('stripePriceId')?.toString()
-    const priceAmount = data.get('priceAmount')?.toString()
-    const currency = data.get('currency')?.toString() || 'usd'
+    const priceAmountRaw = data.get('priceAmount')?.toString()
+    const currencyRaw = (data.get('currency')?.toString() || 'USD').toUpperCase()
+    const currencyCode: CurrencyCode = isCurrencyCode(currencyRaw) ? currencyRaw : 'USD'
+    const currency = currencyCode.toLowerCase()
+    const priceAmountWhole = priceAmountRaw ? parseFloat(priceAmountRaw) : NaN
+    const fxRates = await getCurrencyRatesFromSettings()
+    const priceAmountCents = !isNaN(priceAmountWhole) && priceAmountWhole >= 0 ? wholeUnitsToUsdCents(priceAmountWhole, currencyCode, fxRates) : NaN
+    const priceAmountBdtPaisa = !isNaN(priceAmountCents) ? Math.round((priceAmountCents / 100) * (fxRates.BDT ?? 110) * 100) : null
+    const priceAmount = isNaN(priceAmountCents) ? '' : String(priceAmountCents)
     const billingInterval = data.get('billingInterval')?.toString()
     const textGenerationLimit = data.get('textGenerationLimit')?.toString()
     const imageGenerationLimit = data.get('imageGenerationLimit')?.toString()
@@ -41,8 +51,8 @@ export const actions: Actions = {
         name,
         tier,
         stripePriceId,
-        priceAmount,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         billingInterval,
         textGenerationLimit,
         imageGenerationLimit,
@@ -59,8 +69,8 @@ export const actions: Actions = {
         name,
         tier,
         stripePriceId,
-        priceAmount,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         billingInterval,
         textGenerationLimit,
         imageGenerationLimit,
@@ -77,8 +87,8 @@ export const actions: Actions = {
         name,
         tier,
         stripePriceId,
-        priceAmount,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         billingInterval,
         textGenerationLimit,
         imageGenerationLimit,
@@ -89,15 +99,15 @@ export const actions: Actions = {
       })
     }
 
-    const priceAmountNum = parseInt(priceAmount)
+    const priceAmountNum = priceAmountCents
     if (isNaN(priceAmountNum) || priceAmountNum < 0) {
       return fail(400, {
         error: 'Price amount must be a valid positive number',
         name,
         tier,
         stripePriceId,
-        priceAmount,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         billingInterval,
         textGenerationLimit,
         imageGenerationLimit,
@@ -132,6 +142,7 @@ export const actions: Actions = {
         tier: tier as 'free' | 'starter' | 'pro' | 'advanced',
         stripePriceId,
         priceAmount: priceAmountNum,
+        priceAmountBdt: priceAmountBdtPaisa,
         currency,
         billingInterval: billingInterval as 'month' | 'year',
         textGenerationLimit: textLimit !== null && !isNaN(textLimit) ? textLimit : null,
@@ -157,8 +168,8 @@ export const actions: Actions = {
         name,
         tier,
         stripePriceId,
-        priceAmount,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         billingInterval,
         textGenerationLimit,
         imageGenerationLimit,

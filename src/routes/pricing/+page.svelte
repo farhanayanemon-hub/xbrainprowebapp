@@ -1,4 +1,10 @@
 <script lang="ts">
+  const showPrimaryCta = $derived(
+    data.activePaymentProvider !== "opaybd" || data.userCurrency === "BDT",
+  );
+
+  // Effective primary gateway per user currency: BDT → opaybd, others → manual
+
   import Button from "$lib/components/ui/button/button.svelte";
   import { Badge } from "$lib/components/ui/badge/index.js";
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
@@ -442,7 +448,8 @@
               {/if}
             </div>
 
-            <!-- CTA -->
+            <!-- CTA: hidden when user currency != BDT and admin's primary provider is opaybd (those users use manual gateways instead) -->
+            {#if showPrimaryCta}
             <Button
               class={`cursor-pointer w-full mb-6 font-semibold transition-all duration-300 ${
                 isCurrentPlan(plan.tier)
@@ -467,6 +474,7 @@
                 {/if}
               {/if}
             </Button>
+            {/if}
 
             <!-- Features -->
             <div class="flex-1">
@@ -485,7 +493,7 @@
               </ul>
             </div>
 
-            {#if data.manualGatewaysEnabled && plan.tier !== "free" && !isCurrentPlan(plan.tier)}
+            {#if data.manualGatewaysEnabled && plan.tier !== "free" && !isCurrentPlan(plan.tier) && data.userCurrency !== "BDT"}
               <button
                 type="button"
                 class="w-full text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 mb-3 cursor-pointer"

@@ -231,7 +231,7 @@
           </div>
         {/if}
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4">
           <div class="space-y-2">
             <Label for="priceAmount">Price (in cents)</Label>
             <Input
@@ -240,7 +240,7 @@
               type="number"
               placeholder="999"
               min="0"
-              value={form?.priceAmount || data.plan.priceAmount}
+              value={form?.priceAmount ?? priceWholeUnits}
               required
             />
             <p class="text-xs text-muted-foreground">
@@ -250,21 +250,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <Label for="priceAmountBdt">Price BDT (in paisa)</Label>
-            <Input
-              id="priceAmountBdt"
-              name="priceAmountBdt"
-              type="number"
-              placeholder="50000"
-              min="0"
-              value={form?.priceAmountBdt || (data.plan.priceAmountBdt ?? "")}
-            />
-            <p class="text-xs text-muted-foreground">
-              For Opaybd payments (e.g., 50000 = ৳500)
-            </p>
-          </div>
-
           <div class="space-y-2">
             <Label for="currency">Currency</Label>
             <Select.Root type="single" name="currency" bind:value={currency}>

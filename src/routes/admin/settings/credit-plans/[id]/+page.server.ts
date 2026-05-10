@@ -3,6 +3,9 @@ import { db, creditPlans } from '$lib/server/db/index.js'
 import { eq } from 'drizzle-orm'
 import { fail, redirect, error } from '@sveltejs/kit'
 import { isDemoModeEnabled, DEMO_MODE_MESSAGES } from '$lib/constants/demo-mode.js'
+import { wholeUnitsToUsdCents } from '$lib/utils/price-conversion.js'
+import { getCurrencyRatesFromSettings } from '$lib/server/get-currency-rates.js'
+import { isCurrencyCode, type CurrencyCode } from '$lib/utils/currencies.js'
 
 const ALLOWED_CREDIT_TYPES = ['text', 'image', 'video', 'audio'] as const
 type CreditTypeValue = typeof ALLOWED_CREDIT_TYPES[number]
@@ -70,9 +73,15 @@ export const actions: Actions = {
     const name = data.get('name')?.toString()
     const description = data.get('description')?.toString() || null
     const creditTypesArr = parseCreditTypes(data)
-    const priceAmount = data.get('priceAmount')?.toString()
-    const priceAmountBdt = data.get('priceAmountBdt')?.toString()
-    const currency = data.get('currency')?.toString() || 'usd'
+    const priceAmountRaw = data.get('priceAmount')?.toString()
+    const currencyRaw = (data.get('currency')?.toString() || 'USD').toUpperCase()
+    const currencyCode: CurrencyCode = isCurrencyCode(currencyRaw) ? currencyRaw : 'USD'
+    const currency = currencyCode.toLowerCase()
+    const priceAmountWhole = priceAmountRaw ? parseFloat(priceAmountRaw) : NaN
+    const fxRates = await getCurrencyRatesFromSettings()
+    const priceAmountCents = !isNaN(priceAmountWhole) && priceAmountWhole >= 0 ? wholeUnitsToUsdCents(priceAmountWhole, currencyCode, fxRates) : NaN
+    const priceAmountBdt = !isNaN(priceAmountCents) ? Math.round((priceAmountCents / 100) * (fxRates.BDT ?? 110) * 100) : null
+    const priceAmount = isNaN(priceAmountCents) ? '' : String(priceAmountCents)
     const isActive = data.get('isActive') === 'on'
 
     const { amounts: creditAmountsMap, max: creditAmountMax, error: amtErr } =
@@ -85,28 +94,23 @@ export const actions: Actions = {
         description,
         creditTypes: creditTypesArr,
         creditAmounts: creditAmountsMap,
-        priceAmount,
-        priceAmountBdt,
-        currency,
+        priceAmount: priceAmountRaw,
+        currency: currencyCode,
         isActive,
       })
 
-    if (!name || creditTypesArr.length === 0 || !priceAmount) {
+    if (!name || creditTypesArr.length === 0 || !priceAmountRaw) {
       return failBack(400, 'Name, at least one credit type and price are required')
+    }
+    if (isNaN(priceAmountCents) || priceAmountCents < 0) {
+      return failBack(400, 'Price must be a valid positive number')
     }
 
     if (amtErr) return failBack(400, amtErr)
     const creditAmountNum = creditAmountMax
 
-    const priceAmountNum = parseInt(priceAmount)
-    if (isNaN(priceAmountNum) || priceAmountNum < 0) {
-      return failBack(400, 'Price amount must be a valid positive number')
-    }
-
-    const priceAmountBdtNum = priceAmountBdt ? parseInt(priceAmountBdt) : null
-    if (priceAmountBdtNum !== null && (isNaN(priceAmountBdtNum) || priceAmountBdtNum < 0)) {
-      return failBack(400, 'BDT price must be a valid positive number')
-    }
+    const priceAmountNum = priceAmountCents
+    const priceAmountBdtNum = priceAmountBdt
 
     try {
       await db
