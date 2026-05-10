@@ -143,17 +143,16 @@
         <form
           method="POST"
           action="?/create"
-          use:enhance={() =>
-{
+          use:enhance={() => {
             isSubmitting = true;
-            return async ({ update }) =>
-      <input type="hidden" name="currency" value="usd" /> {
+            return async ({ update }) => {
               await update();
               isSubmitting = false;
             };
           }}
           class="space-y-6"
         >
+          <input type="hidden" name="currency" value="usd" />
           {#if form?.error}
             <div
               class="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md"
