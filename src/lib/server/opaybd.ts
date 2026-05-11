@@ -151,34 +151,39 @@ export class OpayService {
                 const successUrlObj = new URL(params.successUrl);
                 const webhookUrl = `${successUrlObj.origin}/api/opaybd/webhook`;
 
+                const subscriptionPayload = {
+                        cus_name: user.name || user.email?.split('@')[0] || 'Customer',
+                        cus_email: user.email,
+                        cus_phone: (user as any).phone || '01700000000',
+                        amount: amount,
+                        currency: 'BDT',
+                        success_url: params.successUrl,
+                        cancel_url: params.cancelUrl,
+                        webhook_url: webhookUrl,
+                        metadata: metadata,
+                        meta_data: JSON.stringify(metadata),
+                };
+                console.log('Opaybd createPayment (subscription) request:', subscriptionPayload);
                 const response = await fetch(`${OPAY_API_BASE}/create`, {
                         method: 'POST',
                         headers,
-                        body: JSON.stringify({
-                                cus_name: user.name || user.email?.split('@')[0] || 'Customer',
-                                cus_email: user.email,
-                                amount: amount, // Send as number per Opaybd API spec
-                                success_url: params.successUrl,
-                                cancel_url: params.cancelUrl,
-                                webhook_url: webhookUrl,
-                                metadata: metadata,
-                                meta_data: JSON.stringify(metadata),
-                        }),
+                        body: JSON.stringify(subscriptionPayload),
                 });
 
                 if (!response.ok) {
                         const errorText = await response.text();
-                        console.error('Opaybd create payment error:', errorText);
-                        throw new Error(`Opaybd API error: ${response.status}`);
+                        console.error('Opaybd create payment error:', response.status, errorText);
+                        throw new Error(`Opaybd API error: ${response.status} ${errorText}`);
                 }
 
                 const data = await response.json();
 
                 if (!data.status) {
+                        console.error('Opaybd subscription rejected by gateway:', data);
                         throw new Error(data.message || 'Failed to create payment with Opaybd');
                 }
 
-                console.log('Opaybd payment created successfully:', data);
+                console.log('Opaybd payment created (subscription) response:', data);
                 return data;
         }
 
