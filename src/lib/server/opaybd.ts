@@ -181,12 +181,18 @@ export class OpayService {
                 amount,
                 currency,
                 description,
+                successUrl,
+                cancelUrl,
+                webhookUrl,
         }: {
                 userId: string;
                 creditPlanId: string;
                 amount: number;
                 currency: string;
                 description: string;
+                successUrl: string;
+                cancelUrl: string;
+                webhookUrl: string;
         }): Promise<{ paymentUrl: string }> {
                 const [user] = await db.select().from(users).where(eq(users.id, userId));
                 if (!user) {
@@ -203,9 +209,6 @@ export class OpayService {
                         type: 'credit_purchase',
                 };
 
-                const origin = process.env.ORIGIN || '';
-                const webhookUrl = `${origin}/api/opaybd/webhook`;
-
                 const response = await fetch(`${OPAY_API_BASE}/create`, {
                         method: 'POST',
                         headers,
@@ -213,21 +216,28 @@ export class OpayService {
                                 cus_name: user.name || user.email?.split('@')[0] || 'Customer',
                                 cus_email: user.email,
                                 amount: amountValue,
-                                success_url: `${origin}/settings/billing?credit_purchase=success`,
-                                cancel_url: `${origin}/settings/billing?credit_purchase=cancelled`,
+                                success_url: successUrl,
+                                cancel_url: cancelUrl,
                                 webhook_url: webhookUrl,
                                 metadata: metadata,
                                 meta_data: JSON.stringify(metadata),
                         }),
                 });
 
+                console.log('Opaybd createCreditPayment request:', {
+                        amount: amountValue, currency,
+                        success_url: successUrl, cancel_url: cancelUrl, webhook_url: webhookUrl,
+                        metadata,
+                });
+
                 if (!response.ok) {
                         const errorText = await response.text();
-                        console.error('Opaybd create credit payment error:', errorText);
-                        throw new Error(`Opaybd API error: ${response.status}`);
+                        console.error('Opaybd create credit payment error:', response.status, errorText);
+                        throw new Error(`Opaybd API error: ${response.status} ${errorText}`);
                 }
 
                 const data = await response.json();
+                console.log('Opaybd createCreditPayment response:', data);
 
                 if (!data.status) {
                         throw new Error(data.message || 'Failed to create credit payment with Opaybd');

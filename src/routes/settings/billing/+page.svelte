@@ -362,8 +362,11 @@
     // Handle Opaybd payment callback results
     if (urlParams.get("opay_success") === "true") {
       const planTier = urlParams.get("plan_tier");
+      const isCredit = planTier === "credit_purchase";
       toast.success(
-        planTier
+        isCredit
+          ? "Credits added to your account successfully!"
+          : planTier
           ? `Successfully subscribed to ${planTier} plan via Opaybd!`
           : "Payment successful! Your subscription is now active."
       );
