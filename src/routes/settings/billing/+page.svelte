@@ -515,6 +515,23 @@
         })
       : null
   );
+  const daysRemaining = $derived(
+    subscription?.currentPeriodEnd
+      ? Math.max(
+          0,
+          Math.ceil(
+            (new Date(subscription.currentPeriodEnd).getTime() - Date.now()) /
+              (1000 * 60 * 60 * 24)
+          )
+        )
+      : 0
+  );
+  const isExpired = $derived(
+    subscription?.status === "expired" ||
+      (subscription?.currentPeriodEnd
+        ? new Date(subscription.currentPeriodEnd).getTime() < Date.now()
+        : false)
+  );
 
   // Handle manage subscription (open customer portal)
   async function handleManageSubscription() {
@@ -707,9 +724,13 @@
             <p class="text-sm text-muted-foreground">
               {m["billing.subscription_cancelled"]({ date: nextBillingDate })}
             </p>
+          {:else if isExpired}
+            <p class="text-sm text-destructive">
+              {m["billing.subscription_expired_notice"]({ date: nextBillingDate })}
+            </p>
           {:else}
             <p class="text-sm text-muted-foreground">
-              {m["billing.subscription_auto_renew"]({ date: nextBillingDate })}
+              {m["billing.subscription_auto_renew"]({ date: nextBillingDate, daysRemaining: String(daysRemaining) })}
             </p>
           {/if}
         </div>

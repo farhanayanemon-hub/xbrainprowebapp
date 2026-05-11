@@ -272,7 +272,7 @@
     "updating": "Updating...",
     "syncing_attempt": "Syncing... (attempt {attempt})",
     "plan_features": "Plan Features:",
-    "subscription_auto_renew": "NOTE: Your subscription will auto renew on {date}.",
+    "subscription_auto_renew": "NOTE: Your subscription will expire on {date} ({daysRemaining} days remaining). Please renew before then to keep your plan active.",
     "subscription_cancelled": "NOTE: Your subscription will be cancelled on {date} and you will no longer be billed.",
     "manage_subscription": "Manage Subscription",
     "upgrade_plan": "Upgrade Plan",
@@ -311,7 +311,8 @@
     "toast_payment_verification": "Payment verification pending. Please check back in a few moments.",
     "toast_verifying_payment": "Verifying your payment. Your subscription will be activated shortly.",
     "feature_limited_ai_access": "Limited access to Text models",
-    "feature_text_only_models": "Limited access to Image models"
+    "feature_text_only_models": "Limited access to Image models",
+    "subscription_expired_notice": "Your subscription expired on {date}. You have been moved to the Free plan. Subscribe again to restore your plan benefits."
   },
   "usage": {
     "page_title": "Usage - Settings",

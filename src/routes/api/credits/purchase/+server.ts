@@ -8,7 +8,7 @@ import { getActivePaymentProvider } from '$lib/server/settings-store.js';
 import { StripeService } from '$lib/server/stripe.js';
 import { OpayService } from '$lib/server/opaybd.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request, locals, url }) => {
 	const session = await locals.auth();
 	if (!session?.user?.id) {
 		return json({ error: 'Unauthorized' }, { status: 401 });

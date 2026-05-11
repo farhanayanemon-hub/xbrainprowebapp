@@ -272,7 +272,7 @@
     "updating": "Actualizando...",
     "syncing_attempt": "Sincronizando... (intento {attempt})",
     "plan_features": "Características del plan:",
-    "subscription_auto_renew": "NOTA: Tu suscripción se renovará automáticamente el {date}.",
+    "subscription_auto_renew": "NOTA: Tu suscripción vencerá el {date} ({daysRemaining} días restantes). Renueva antes para mantener tu plan activo.",
     "subscription_cancelled": "NOTA: Tu suscripción será cancelada el {date} y ya no se te cobrará.",
     "manage_subscription": "Gestionar suscripción",
     "upgrade_plan": "Actualizar plan",
@@ -311,7 +311,8 @@
     "toast_payment_verification": "Verificación de pago pendiente. Por favor, vuelve a verificar en unos momentos.",
     "toast_verifying_payment": "Verificando tu pago. Tu suscripción se activará en breve.",
     "feature_limited_ai_access": "Acceso limitado a modelos de texto",
-    "feature_text_only_models": "Acceso limitado a modelos de imagen"
+    "feature_text_only_models": "Acceso limitado a modelos de imagen",
+    "subscription_expired_notice": "Tu suscripción venció el {date}. Has sido movido al plan Gratis. Suscríbete de nuevo para restaurar los beneficios."
   },
   "usage": {
     "page_title": "Uso - Configuración",

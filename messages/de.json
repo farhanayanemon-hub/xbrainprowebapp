@@ -272,7 +272,7 @@
     "updating": "Aktualisiere...",
     "syncing_attempt": "Synchronisiere... (Versuch {attempt})",
     "plan_features": "Plan-Funktionen:",
-    "subscription_auto_renew": "HINWEIS: Ihr Abonnement verlängert sich automatisch am {date}.",
+    "subscription_auto_renew": "HINWEIS: Ihr Abonnement läuft am {date} ab (noch {daysRemaining} Tage). Bitte erneuern Sie es vorher, um Ihren Plan aktiv zu halten.",
     "subscription_cancelled": "HINWEIS: Ihr Abonnement wird am {date} gekündigt und Sie werden nicht mehr belastet.",
     "manage_subscription": "Abonnement verwalten",
     "upgrade_plan": "Plan aktualisieren",
@@ -311,7 +311,8 @@
     "toast_payment_verification": "Zahlungsverifizierung ausstehend. Bitte schauen Sie in ein paar Minuten wieder vorbei.",
     "toast_verifying_payment": "Verifiziere Ihre Zahlung. Ihr Abonnement wird in Kürze aktiviert.",
     "feature_limited_ai_access": "Eingeschränkter Zugriff auf Textmodelle",
-    "feature_text_only_models": "Eingeschränkter Zugriff auf Bildmodelle"
+    "feature_text_only_models": "Eingeschränkter Zugriff auf Bildmodelle",
+    "subscription_expired_notice": "Ihr Abonnement ist am {date} abgelaufen. Sie wurden auf den Free-Plan verschoben. Abonnieren Sie erneut, um Ihre Vorteile wiederherzustellen."
   },
   "usage": {
     "page_title": "Nutzung - Einstellungen",

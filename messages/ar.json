@@ -272,7 +272,7 @@
     "updating": "جاري التحديث...",
     "syncing_attempt": "جاري المزامنة... (محاولة {attempt})",
     "plan_features": "ميزات الخطة:",
-    "subscription_auto_renew": "ملاحظة: سيتم تجديد اشتراكك تلقائياً في {date}.",
+    "subscription_auto_renew": "ملاحظة: ستنتهي صلاحية اشتراكك في {date} (متبقي {daysRemaining} يوم). يرجى التجديد قبل ذلك للحفاظ على خطتك نشطة.",
     "subscription_cancelled": "ملاحظة: سيتم إلغاء اشتراكك في {date} ولن يتم محاسبتك بعد الآن.",
     "manage_subscription": "إدارة الاشتراك",
     "upgrade_plan": "ترقية الخطة",
@@ -311,7 +311,8 @@
     "toast_payment_verification": "التحقق من الدفع معلق. يرجى التحقق مرة أخرى بعد لحظات قليلة.",
     "toast_verifying_payment": "جاري التحقق من دفعتك. سيتم تفعيل اشتراكك قريباً.",
     "feature_limited_ai_access": "وصول محدود لنماذج النصوص",
-    "feature_text_only_models": "وصول محدود لنماذج الصور"
+    "feature_text_only_models": "وصول محدود لنماذج الصور",
+    "subscription_expired_notice": "انتهت صلاحية اشتراكك في {date}. تم نقلك إلى الخطة المجانية. اشترك مرة أخرى لاستعادة مزايا خطتك."
   },
   "usage": {
     "page_title": "الاستخدام - الإعدادات",
