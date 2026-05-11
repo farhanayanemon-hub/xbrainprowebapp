@@ -154,7 +154,6 @@ export class OpayService {
                 const subscriptionPayload = {
                         cus_name: user.name || user.email?.split('@')[0] || 'Customer',
                         cus_email: user.email,
-                        cus_phone: (user as any).phone || '01700000000',
                         amount: amount,
                         currency: 'BDT',
                         success_url: params.successUrl,
