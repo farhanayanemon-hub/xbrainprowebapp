@@ -14,7 +14,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/index.js';
-import { subscription, user, pricingPlan } from '$lib/server/db/schema.js';
+import { subscriptions, users, pricingPlans } from '$lib/server/db/schema.js';
 import { and, eq, lte, gte, lt, or, isNull } from 'drizzle-orm';
 import { emailService } from '$lib/server/email.js';
 
@@ -38,14 +38,14 @@ export const POST: RequestHandler = async ({ request }) => {
   // 1) Auto-expire past-due subscriptions
   try {
     const past = await db
-      .select({ id: subscription.id })
+      .select({ id: subscriptions.id })
       .from(subscription)
-      .where(and(eq(subscription.status, 'active'), lt(subscription.currentPeriodEnd, now)));
+      .where(and(eq(subscriptions.status, 'active'), lt(subscriptions.currentPeriodEnd, now)));
     for (const row of past) {
       await db
         .update(subscription)
         .set({ status: 'expired', endedAt: now, updatedAt: now })
-        .where(eq(subscription.id, row.id));
+        .where(eq(subscriptions.id, row.id));
       expired++;
     }
   } catch (e) {
@@ -56,22 +56,22 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const upcoming = await db
       .select({
-        id: subscription.id,
-        userId: subscription.userId,
-        planTier: subscription.planTier,
-        currentPeriodEnd: subscription.currentPeriodEnd,
-        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-        renewalReminderSentAt: subscription.renewalReminderSentAt,
-        email: user.email,
-        name: user.name,
+        id: subscriptions.id,
+        userId: subscriptions.userId,
+        planTier: subscriptions.planTier,
+        currentPeriodEnd: subscriptions.currentPeriodEnd,
+        cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+        renewalReminderSentAt: subscriptions.renewalReminderSentAt,
+        email: users.email,
+        name: users.name,
       })
       .from(subscription)
-      .innerJoin(user, eq(user.id, subscription.userId))
+      .innerJoin(users, eq(users.id, subscriptions.userId))
       .where(
         and(
-          eq(subscription.status, 'active'),
-          gte(subscription.currentPeriodEnd, now),
-          lte(subscription.currentPeriodEnd, reminderHorizon)
+          eq(subscriptions.status, 'active'),
+          gte(subscriptions.currentPeriodEnd, now),
+          lte(subscriptions.currentPeriodEnd, reminderHorizon)
         )
       );
 
@@ -93,9 +93,9 @@ export const POST: RequestHandler = async ({ request }) => {
       let planName = sub.planTier;
       try {
         const [p] = await db
-          .select({ name: pricingPlan.name })
-          .from(pricingPlan)
-          .where(eq(pricingPlan.tier, sub.planTier))
+          .select({ name: pricingPlans.name })
+          .from(pricingPlans)
+          .where(eq(pricingPlans.tier, sub.planTier))
           .limit(1);
         if (p?.name) planName = p.name;
       } catch {
@@ -117,7 +117,7 @@ export const POST: RequestHandler = async ({ request }) => {
         await db
           .update(subscription)
           .set({ renewalReminderSentAt: now, updatedAt: now })
-          .where(eq(subscription.id, sub.id));
+          .where(eq(subscriptions.id, sub.id));
         remindersSent++;
       } catch (e) {
         errors.push(`reminder ${sub.id}: ${(e as Error).message}`);

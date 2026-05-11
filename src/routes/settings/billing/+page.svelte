@@ -527,7 +527,7 @@
       : 0
   );
   const isExpired = $derived(
-    subscription?.status === "expired" ||
+    (subscription?.status as string) === "expired" ||
       (subscription?.currentPeriodEnd
         ? new Date(subscription.currentPeriodEnd).getTime() < Date.now()
         : false)
