@@ -83,6 +83,12 @@ export const actions: Actions = {
       else periodEnd.setMonth(periodEnd.getMonth() + 1);
 
       await db.transaction(async (tx) => {
+        // Re-fetch order INSIDE the tx and FOR UPDATE the row by re-checking status —
+        // protects against two admins clicking "Complete" simultaneously.
+        const [orderRow] = await tx.select().from(manualOrders).where(eq(manualOrders.id, id)).limit(1);
+        if (!orderRow || orderRow.status === 'completed') {
+          return; // Another admin already completed it; skip silently.
+        }
         const [existingSub] = await tx
           .select()
           .from(subscriptions)
@@ -135,17 +141,27 @@ export const actions: Actions = {
           opayPaymentMethod: order.gateway,
           paidAt: now,
         });
-      });
-    }
 
-    // Mark order completed
-    await db.update(manualOrders).set({
-      status: 'completed',
-      adminNotes,
-      completedBy: adminWho,
-      completedAt: now,
-      updatedAt: now,
-    }).where(eq(manualOrders.id, id));
+        // Mark order completed in same tx — entitlement + status atomic
+        await tx.update(manualOrders).set({
+          status: 'completed',
+          adminNotes,
+          completedBy: adminWho,
+          completedAt: now,
+          updatedAt: now,
+        }).where(eq(manualOrders.id, id));
+      });
+    } else {
+      // Credit branch already completed above (purchaseCredits is now idempotent
+      // across the suffixed multi-type rows). Mark order as completed.
+      await db.update(manualOrders).set({
+        status: 'completed',
+        adminNotes,
+        completedBy: adminWho,
+        completedAt: now,
+        updatedAt: now,
+      }).where(eq(manualOrders.id, id));
+    }
 
     // Send confirmation email to user (non-blocking)
     if (order.userEmail) {

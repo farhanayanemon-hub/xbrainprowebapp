@@ -88,6 +88,7 @@ export const load: PageServerLoad = async ({ parent }) => {
                         userCredits: userCreditBalances,
                         creditPlans: activeCreditPlans,
                         activePaymentProvider: activeProvider,
+                        manualGatewaysEnabled,
                 };
         } catch (error) {
                 console.error('Error loading billing data:', error);
@@ -99,6 +100,7 @@ export const load: PageServerLoad = async ({ parent }) => {
                         userCredits: { text: 0, image: 0, video: 0, audio: 0 },
                         creditPlans: [],
                         activePaymentProvider: 'stripe' as const,
+                        manualGatewaysEnabled: false,
                 };
         }
 };

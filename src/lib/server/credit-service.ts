@@ -1,6 +1,6 @@
 import { db } from './db/index.js';
 import { userCredits, creditPlans } from './db/schema.js';
-import { eq, and, gt, sql, isNull, or } from 'drizzle-orm';
+import { eq, and, gt, sql, isNull, or, like } from 'drizzle-orm';
 
 export type CreditType = 'text' | 'image' | 'video' | 'audio';
 
@@ -104,10 +104,16 @@ export class CreditService {
                 paymentProvider: 'stripe' | 'opaybd',
                 transactionId: string
         ): Promise<void> {
+                // Multi-type plans store rows as `${transactionId}#${type}`. Match both
+                // the raw id and any suffixed variant to keep this idempotent across
+                // retries (manual admin re-completes, webhook re-deliveries, etc).
                 const [existing] = await db
                         .select({ id: userCredits.id })
                         .from(userCredits)
-                        .where(eq(userCredits.transactionId, transactionId))
+                        .where(or(
+                                eq(userCredits.transactionId, transactionId),
+                                like(userCredits.transactionId, `${transactionId}#%`)
+                        ))
                         .limit(1);
 
                 if (existing) {

@@ -707,6 +707,19 @@ async function resolveAdminNotificationEmail(): Promise<string | null> {
 }
 
 /**
+ * HTML-escape untrusted strings before interpolating into admin email templates.
+ */
+function escapeHtml(v: string | null | undefined): string {
+  if (v === null || v === undefined) return ''
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+/**
  * Send admin a notification when ANY order is placed (manual or auto).
  * Non-blocking: errors are logged but never thrown.
  */
@@ -744,15 +757,15 @@ export async function sendAdminOrderNotification(n: AdminOrderNotification): Pro
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <tr><td style="padding:6px 0;color:#666;width:140px">Status</td><td style="padding:6px 0;font-weight:600;color:${n.status === 'pending-verification' ? '#b45309' : '#15803d'}">${statusLabel}</td></tr>
         <tr><td style="padding:6px 0;color:#666">Order type</td><td style="padding:6px 0">${orderTypeLabel}</td></tr>
-        <tr><td style="padding:6px 0;color:#666">Plan / Pack</td><td style="padding:6px 0;font-weight:600">${n.planName}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Plan / Pack</td><td style="padding:6px 0;font-weight:600">${escapeHtml(n.planName)}</td></tr>
         <tr><td style="padding:6px 0;color:#666">Amount</td><td style="padding:6px 0;font-weight:600">${amountStr}</td></tr>
-        <tr><td style="padding:6px 0;color:#666">Gateway</td><td style="padding:6px 0;text-transform:capitalize">${n.gateway}</td></tr>
-        <tr><td style="padding:6px 0;color:#666">User</td><td style="padding:6px 0">${n.userName || '—'}${n.userEmail ? ` &lt;${n.userEmail}&gt;` : ''}</td></tr>
-        ${n.userId ? `<tr><td style="padding:6px 0;color:#666">User ID</td><td style="padding:6px 0;font-family:monospace;font-size:12px">${n.userId}</td></tr>` : ''}
-        ${n.txnReference ? `<tr><td style="padding:6px 0;color:#666">Txn / Ref</td><td style="padding:6px 0;font-family:monospace;font-size:12px;word-break:break-all">${n.txnReference}</td></tr>` : ''}
-        ${n.senderInfo ? `<tr><td style="padding:6px 0;color:#666">Sender info</td><td style="padding:6px 0">${n.senderInfo}</td></tr>` : ''}
-        ${n.userNotes ? `<tr><td style="padding:6px 0;color:#666;vertical-align:top">User notes</td><td style="padding:6px 0;white-space:pre-wrap">${n.userNotes}</td></tr>` : ''}
-        ${n.orderId ? `<tr><td style="padding:6px 0;color:#666">Order ID</td><td style="padding:6px 0;font-family:monospace;font-size:12px">${n.orderId}</td></tr>` : ''}
+        <tr><td style="padding:6px 0;color:#666">Gateway</td><td style="padding:6px 0;text-transform:capitalize">${escapeHtml(n.gateway)}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">User</td><td style="padding:6px 0">${escapeHtml(n.userName) || '—'}${n.userEmail ? ` &lt;${escapeHtml(n.userEmail)}&gt;` : ''}</td></tr>
+        ${n.userId ? `<tr><td style="padding:6px 0;color:#666">User ID</td><td style="padding:6px 0;font-family:monospace;font-size:12px">${escapeHtml(n.userId)}</td></tr>` : ''}
+        ${n.txnReference ? `<tr><td style="padding:6px 0;color:#666">Txn / Ref</td><td style="padding:6px 0;font-family:monospace;font-size:12px;word-break:break-all">${escapeHtml(n.txnReference)}</td></tr>` : ''}
+        ${n.senderInfo ? `<tr><td style="padding:6px 0;color:#666">Sender info</td><td style="padding:6px 0">${escapeHtml(n.senderInfo)}</td></tr>` : ''}
+        ${n.userNotes ? `<tr><td style="padding:6px 0;color:#666;vertical-align:top">User notes</td><td style="padding:6px 0;white-space:pre-wrap">${escapeHtml(n.userNotes)}</td></tr>` : ''}
+        ${n.orderId ? `<tr><td style="padding:6px 0;color:#666">Order ID</td><td style="padding:6px 0;font-family:monospace;font-size:12px">${escapeHtml(n.orderId)}</td></tr>` : ''}
       </table>
       <div style="margin-top:20px;text-align:center">
         <a href="${reviewUrl}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:14px">${isManual ? 'Review & verify order' : 'View in admin panel'}</a>
@@ -767,18 +780,18 @@ export async function sendAdminOrderNotification(n: AdminOrderNotification): Pro
 
 Status: ${statusLabel}
 Type: ${orderTypeLabel}
-Plan: ${n.planName}
+Plan: ${escapeHtml(n.planName)}
 Amount: ${amountStr}
-Gateway: ${n.gateway}
+Gateway: ${escapeHtml(n.gateway)}
 User: ${n.userName || ''} <${n.userEmail || ''}>
-${n.txnReference ? `Txn: ${n.txnReference}
-` : ''}${n.userNotes ? `Notes: ${n.userNotes}
+${n.txnReference ? `Txn: ${escapeHtml(n.txnReference)}
+` : ''}${n.userNotes ? `Notes: ${escapeHtml(n.userNotes)}
 ` : ''}
 Review: ${reviewUrl}`
 
     await emailService.sendEmail({
       to: adminEmail,
-      subject: `${subjectPrefix} · ${n.planName} (${amountStr})`,
+      subject: `${subjectPrefix} · ${escapeHtml(n.planName)} (${amountStr})`,
       html,
       text,
     })
