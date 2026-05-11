@@ -127,7 +127,7 @@
     "supports_tools": "يدعم استدعاء الأدوات",
     "file_support": "دعم الملفات",
     "generating_response": "جاري إنشاء الرد...",
-    "type_message_here": "اكتب رسالتك هنا... (اضغط Enter للإرسال، Shift+Enter لسطر جديد)",
+    "type_message_here": "اكتب رسالتك هنا...",
     "loading": "جاري التحميل...",
     "select": "اختر",
     "sending": "جاري الإرسال...",

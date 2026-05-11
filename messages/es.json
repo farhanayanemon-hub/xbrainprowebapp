@@ -127,7 +127,7 @@
     "supports_tools": "Admite llamadas a herramientas",
     "file_support": "Soporte de archivos",
     "generating_response": "Generando respuesta...",
-    "type_message_here": "Escribe tu mensaje aquí... (Presiona Enter para enviar, Shift+Enter para nueva línea)",
+    "type_message_here": "Escribe tu mensaje aquí...",
     "loading": "Cargando...",
     "select": "Seleccionar",
     "sending": "Enviando...",

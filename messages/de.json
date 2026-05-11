@@ -127,7 +127,7 @@
     "supports_tools": "Unterstützt Tool-Aufrufe",
     "file_support": "Datei-Unterstützung",
     "generating_response": "Antwort wird generiert...",
-    "type_message_here": "Nachricht hier eingeben... (Enter zum Senden, Shift+Enter für neue Zeile)",
+    "type_message_here": "Nachricht hier eingeben...",
     "loading": "Lade...",
     "select": "Auswählen",
     "sending": "Senden...",

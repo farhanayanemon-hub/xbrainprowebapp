@@ -114,7 +114,7 @@
   <!-- Main chat area with auto-scroll management -->
   <Conversation class="flex-1 min-h-0">
     <ConversationContent
-      class="scroll-smooth overflow-x-hidden p-0 {chatState.messages.length ===
+      class="scroll-smooth overflow-x-hidden p-0 pb-[180px] md:pb-0 {chatState.messages.length ===
         0 && !chatState.isLoadingChat
         ? 'overflow-y-hidden'
         : ''}"
