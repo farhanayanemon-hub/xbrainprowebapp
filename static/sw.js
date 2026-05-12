@@ -1,4 +1,4 @@
-const VERSION = 'xbp-v1';
+const VERSION = 'xbp-v3';
 const SHELL = ['/', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -19,7 +19,16 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   // Never cache API / auth / streaming routes
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/') || url.pathname.includes('/stream')) return;
+  if (
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/auth/') ||
+    url.pathname.startsWith('/settings') ||
+    url.pathname.startsWith('/admin') ||
+    url.pathname.startsWith('/checkout') ||
+    url.pathname.startsWith('/login') ||
+    url.pathname.includes('/stream') ||
+    url.pathname.includes('__data.json')
+  ) return;
 
   e.respondWith(
     fetch(req)
