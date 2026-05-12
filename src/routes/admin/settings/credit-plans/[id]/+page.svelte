@@ -44,6 +44,11 @@
   let creditAmountsMap = $state<Record<string, string>>(initialAmounts());
   let currency = $state(form?.currency || data.plan.currency);
 
+  // Convert stored cents → whole-unit strings for the price inputs.
+  // (DB stores priceAmount in USD cents, priceAmountBdt in BDT paisa.)
+  const priceWholeUnits = data.plan.priceAmount != null ? (data.plan.priceAmount / 100).toFixed(2) : '';
+  const priceBdtWholeUnits = data.plan.priceAmountBdt != null ? (data.plan.priceAmountBdt / 100).toFixed(2) : '';
+
   const creditTypeOptions = [
     { value: "text", label: "Text" },
     { value: "image", label: "Image" },
